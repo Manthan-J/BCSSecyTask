@@ -409,7 +409,7 @@ plt.ylabel(" Reward")
 plt.title("Plot of  Rewards")
 plt.legend()
 plt.show()
-
+#converts Q_table into a pickle filel
 import pickle
 with open('qtable.pkl','wb') as f:
     pickle.dump(Q_table,f)
