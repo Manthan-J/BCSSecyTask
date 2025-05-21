@@ -10,6 +10,8 @@ import sys
 from collections import deque
 import pygame
 from os import path
+
+#defining all the constants
 EpisodeNum=20000
 MOVE_PENALTY=-1
 ENEMY_PENALTY=-100
@@ -19,6 +21,7 @@ epsilon_min=0.05
 discount=0.9
 
 epsilon_decay=0.995
+#defining all the actions
 class Action(Enum):
     LEFT=0
     DOWN=1
@@ -49,6 +52,7 @@ map=["XXXXXXXXXXXXXXX",
      "X             X",
      "XXXXXXXXXXXXXXX"]
 intmap=[]
+#converting the map into an integer array where wall is represented by 1 and free floor by 0
 for string in map:
     arr=[]
     for char in string:
@@ -58,7 +62,7 @@ for string in map:
             arr.append(0)
     intmap.append(arr)
 
-
+#assigning random start poisiton for harry,death-eater and cup
 assigned=False
 harry_pos=[]
 DE_pos=[]
@@ -98,6 +102,7 @@ for r in range(10):
             print(GridTile._FLOOR, end=' ')
     print() 
 print() 
+#defining the breadth first search algorithm to find the shortest path between death eater and harry
 Directions=[(-1,0),(1,0),(0,-1),(0,1)]
 def is_valid(x,y):
     return intmap[x][y]==0 
@@ -141,24 +146,14 @@ class Maze:
         pygame.init() # initialize pygame
         pygame.display.init() # Initialize the display module
 
-        # Game clock
         self.clock = pygame.time.Clock()
-
-        # Default font
         self.action_font = pygame.font.SysFont("Calibre",30)
         self.action_info_height = self.action_font.get_height()
-
-        # For rendering
         self.cell_height = 64
         self.cell_width = 64
         self.cell_size = (self.cell_width, self.cell_height)        
-
-        # Define game window size (width, height)
         self.window_size = (self.cell_width * self.grid_cols, self.cell_height * self.grid_rows + self.action_info_height)
-
-        # Initialize game window
         self.window_surface = pygame.display.set_mode(self.window_size) 
-
         # Load & resize sprites
         file_name = "harrypotter.png"
         img = pygame.image.load(file_name)
@@ -180,7 +175,7 @@ class Maze:
         img = pygame.image.load(file_name)
         self.deatheater_img = pygame.transform.scale(img, self.cell_size) 
 
-        
+    #defining the reset function
     def reset(self):
         self.agent_pos=harry_pos
         self.cup_pos=Cup_pos
@@ -216,9 +211,6 @@ class Maze:
 
         
         
-        
-             
-        # return self.agent_pos == self.target_pos #Returns true if agent reaches target
     
     def render(self):
         # Print current state
@@ -241,19 +233,19 @@ class Maze:
         for r in range(self.grid_rows):
             for c in range(self.grid_cols):
                 
-                # Draw floor
+                #rendering the maze using pygame
                 
                 pos = (c * self.cell_width, r * self.cell_height)
                 if([r,c] == self.cup_pos):
-                    # Draw target
+                    
                     self.window_surface.blit(self.cup_img, pos)
 
                 elif([r,c] == self.agent_pos):
-                    # Draw robot
+                
                     self.window_surface.blit(self.harry_img, pos)
                 
                 elif([r,c] == self.enemy_pos):
-                    # Draw robot
+                
                     self.window_surface.blit(self.deatheater_img, pos)
                 
                 elif(intmap[r][c]==0):
@@ -366,7 +358,7 @@ env = gym.make('maze-v0', render_mode='human')
     
     # Reset environment
 obs = env.reset()[0]
-    # Take some random actions
+    
 def  init_q_table(n_states,n_states2, n_actions):
     return np.zeros((n_states,n_states2,n_actions))
 def q_update(Q, s1,s2, a, r, s_next1,s_next2, alpha, gamma):
@@ -383,7 +375,7 @@ total_rewards=[]
 Q_table=init_q_table(150,150,4)
 for episode in range(EpisodeNum):
     obs,info=env.reset()
-    state1=obs[0]*4+obs[1]
+    state1=obs[0]*4+obs[1] #considers both poisition of harry and death-eater as paramters for q 
     state2=obs[2]*4+obs[3]
     done =False
     episode_rewards=0
@@ -400,21 +392,6 @@ for episode in range(EpisodeNum):
     # print("Episode "+str(episode+1)+" Done")
     total_rewards.append(episode_rewards)
     epsilon = max(epsilon_min, epsilon_decay * epsilon)
-
-# done =False
-# obs,info=env.reset()
-# env.render()
-# state1=obs[0]*4+obs[1]
-# state2=obs[2]*4+obs[3]
-# while not done:
-#     action=np.argmax(Q_table[state1][state2])
-#     next_obs,reward,terminated,truncated,info=env.step(action)
-#     env.render()
-#     next_state1=next_obs[0]*4+next_obs[1]
-#     next_state2=next_obs[2]*4+next_obs[3]
-#     state1=next_state1
-#     state2=next_state2
-#     done=terminated
 
     
 
