@@ -410,5 +410,9 @@ plt.title("Plot of  Rewards")
 plt.legend()
 plt.show()
 
+import pickle
+with open('qtable.pkl','wb') as f:
+    pickle.dump(Q_table,f)
+
     
 
